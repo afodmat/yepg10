@@ -21,8 +21,15 @@ async function ensureXsrfToken(): Promise<void> {
 
 let refreshing: Promise<boolean> | null = null;
 function tryRefresh(): Promise<boolean> {
-  refreshing ??= fetch(`${BASE}/auth/refresh`, { method: "POST", credentials: "include", headers: xsrf() })
-    .then((r) => r.ok).catch(() => false).finally(() => { refreshing = null; });
+  refreshing ??= (async () => {
+    try {
+      await ensureXsrfToken();
+      const res = await fetch(`${BASE}/auth/refresh`, { method: "POST", credentials: "include", headers: xsrf() });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  })().finally(() => { refreshing = null; });
   return refreshing;
 }
 

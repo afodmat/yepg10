@@ -39,9 +39,13 @@ describe("api client", () => {
   });
 
   it("refreshes the session once on 401 and retries the request", async () => {
-    const seq = [res(401, { message: "expired" }), res(200, {}), res(200, { ok: true })];
-    const f = vi.fn(() => seq.shift()!); vi.stubGlobal("fetch", f);
+    const seq = [res(401, { message: "expired" }), res(200, {}), res(200, {}), res(200, { ok: true })];
+    const f = vi.fn((url: string | URL | Request, _init?: RequestInit) => {
+      if (String(url).endsWith("/auth/csrf")) document.cookie = "XSRF-TOKEN=refreshed";
+      return seq.shift()!;
+    }); vi.stubGlobal("fetch", f);
     await expect(http.get("/enrollments/mine")).resolves.toEqual({ ok: true });
-    expect(f.mock.calls.map((c) => (c as unknown as [string])[0])).toEqual(["/api/enrollments/mine", "/api/auth/refresh", "/api/enrollments/mine"]);
+    expect(f.mock.calls.map((c) => String(c[0]))).toEqual(["/api/enrollments/mine", "/api/auth/csrf", "/api/auth/refresh", "/api/enrollments/mine"]);
+    expect(f.mock.calls[2]?.[1]?.headers).toMatchObject({ "X-XSRF-TOKEN": "refreshed" });
   });
 });

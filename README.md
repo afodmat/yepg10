@@ -43,7 +43,7 @@ Registration emails are written to the backend log in dev (`LoggingMailService`)
 | `DB_URL`, `DB_USER` (or `DB_USERNAME`), `DB_PASSWORD` | Supabase PostgreSQL connection |
 | `JWT_SECRET` | HMAC key for access tokens (required, ≥32 bytes) |
 | `COOKIE_SECURE` | `true` in production (HTTPS), `false` for plain-http local dev |
-| `CORS_ALLOWED_ORIGINS`, `FRONTEND_URL`, `API_URL` | Origins and link targets |
+| `CORS_ALLOWED_ORIGINS`, `FRONTEND_URL`, `API_URL` | Origins and link targets. Set `CORS_ALLOWED_ORIGINS=https://yepg10.netlify.app` on the backend host (plus any custom frontend origin). |
 | `STORAGE_PATH` | Upload directory |
 | `FORWARD_HEADERS_STRATEGY` | `none` (default) or `native` when behind a trusted reverse proxy, so the rate limiter sees real client IPs |
 | `SPRING_PROFILES_ACTIVE` | `dev` enables seed data + debug logging; never use in production |
